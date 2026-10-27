@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard Eksekutif Kependudukan Jawa Timur</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--ink:#102a43;--mut:#627d98;--line:#d9e2ec;--kab:#1e3a5f;--kota:#0f9d8a;--up:#0f9d8a;--dn:#c0392b;--grid:#e4e9f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1522;--card:#14233a;--ink:#e8eef7;--mut:#9fb3c8;--line:#2a3d5a;--kab:#7fa8e0;--kota:#3fd0bb;--up:#3fd0bb;--dn:#ff8a7a;--grid:#233654}}
+:root[data-theme="dark"]{--bg:#0c1522;--card:#14233a;--ink:#e8eef7;--mut:#9fb3c8;--line:#2a3d5a;--kab:#7fa8e0;--kota:#3fd0bb;--up:#3fd0bb;--dn:#ff8a7a;--grid:#233654}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 Inter,"Segoe UI",system-ui,sans-serif;padding:0 20px 48px}
+.w{max-width:1200px;margin:0 auto}
+header{padding:26px 0 6px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:end}
+h1{font-size:clamp(24px,3.4vw,34px);margin:0;font-weight:800;letter-spacing:-.02em}
+header p{margin:4px 0 0;color:var(--mut);font-size:14px}
+.fb{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}
+.seg button,select,input,.rs{font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--line);padding:8px 12px;cursor:pointer;border-radius:8px}
+.seg{display:flex}.seg button{border-radius:0}.seg button:first-child{border-radius:8px 0 0 8px}.seg button:last-child{border-radius:0 8px 8px 0}.seg button+button{border-left:0}
+.seg button.on{background:var(--kab);color:var(--card);border-color:var(--kab)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.kpi b{display:block;font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.kpi span{color:var(--mut);font-size:13px}.kpi small{display:block;font-size:12.5px;margin-top:4px;font-weight:600}
+.up{color:var(--up)}.dn{color:var(--dn)}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}.g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.g,.g3{grid-template-columns:1fr}}
+h2{font-size:16px;margin:0 0 2px}.sub{color:var(--mut);font-size:12.5px;margin:0 0 10px}
+.cv{position:relative;height:320px}
+.ins{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:12px}
+.ins .card{border-left:4px solid var(--kota)}.ins h3{margin:0 0 4px;font-size:15px}.ins p{margin:0;font-size:14px}
+.sec{margin:26px 0 0;font-size:18px;font-weight:800}
+details summary{cursor:pointer;font-weight:800;font-size:18px}
+.tw{overflow:auto;max-height:480px;margin-top:10px}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}
+th{position:sticky;top:0;background:var(--card);color:var(--mut);cursor:pointer}
+.note{color:var(--mut);font-size:13px;margin-top:18px}
+@media print{.fb{position:static}body{background:#fff}}
+</style></head><body><div class="w">
+<header><div><h1>Dashboard Eksekutif Kependudukan Jawa Timur</h1><p>38 kabupaten/kota · Sumber: BPS Provinsi Jawa Timur · Satu periode data (tidak ada deret waktu)</p></div><button class="rs" onclick="window.print()">Cetak</button></header>
+<div class="fb">
+<div class="seg" id="seg"><button data-f="all" class="on">Semua</button><button data-f="kab">Kabupaten</button><button data-f="kota">Kota</button></div>
+<select id="fd"><option value="">Semua kepadatan</option><option value="r">Rendah (&lt;600/km²)</option><option value="s">Sedang (600–1.500)</option><option value="t">Tinggi (&gt;1.500)</option></select>
+<select id="fr"><option value="">Semua rasio JK</option><option value="l">Dominan laki-laki (&gt;100)</option><option value="p">Dominan perempuan (&lt;100)</option></select>
+<input id="q" placeholder="Cari wilayah"><button class="rs" id="rs">Reset filter</button></div>
+<div class="kpi" id="kpi"></div>
+<p class="sec">Sebaran penduduk dan kepadatan</p>
+<div class="g"><div class="card"><h2>10 wilayah dengan penduduk terbanyak</h2><p class="sub">Jiwa</p><div class="cv"><canvas id="c1"></canvas></div></div>
+<div class="card"><h2>10 wilayah terpadat</h2><p class="sub">Jiwa per km²</p><div class="cv"><canvas id="c2"></canvas></div></div></div>
+<div class="g g3"><div class="card"><h2>Kabupaten vs kota</h2><p class="sub">Porsi penduduk dan porsi luas wilayah (%)</p><div class="cv"><canvas id="c3"></canvas></div></div>
+<div class="card"><h2>Kepadatan vs laju pertumbuhan</h2><p class="sub">Tiap titik satu wilayah (skala log)</p><div class="cv"><canvas id="c4"></canvas></div></div>
+<div class="card"><h2>Distribusi rasio jenis kelamin</h2><p class="sub">Jumlah wilayah per rentang (laki-laki per 100 perempuan)</p><div class="cv"><canvas id="c5"></canvas></div></div></div>
+<div class="g"><div class="card"><h2>Penduduk menurut kelompok kepadatan</h2><p class="sub">Porsi penduduk (%)</p><div class="cv"><canvas id="c6"></canvas></div></div>
+<div class="card"><h2>Laju pertumbuhan per wilayah</h2><p class="sub">Persen per tahun, 10 tertinggi</p><div class="cv"><canvas id="c7"></canvas></div></div></div>
+<div class="card" style="margin-top:20px"><details><summary>Tabel data rinci</summary><div class="tw"><table id="tb"></table></div></details></div>
+<p class="note">Catatan data: penduduk Kota Malang di file asli tertulis 88.682 (kurang satu digit); dipakai 886.820, yaitu selisih total Jawa Timur dengan 37 wilayah lain. Satuan penduduk adalah jiwa meski judul kolom menulis "Ribu". Luas wilayah diturunkan dari penduduk ÷ kepadatan. Laju pertumbuhan mengacu pada keterangan BPS di file; periode acuannya perlu dicek ke tabel asli. Panah KPI membandingkan dengan angka seluruh Jawa Timur (kepadatan 882, laju 0,71%, rasio 99,3), bukan dengan tahun sebelumnya.</p>
+</div>
+<script>
+// Data tertanam (JSON) dari file xlsx BPS: [wilayah, penduduk, laju %, persen, kepadatan, rasio JK]
+const D=[["Pacitan", 589357, 0.1, 1.39, 411, 101.0], ["Ponorogo", 968994, 0.36, 2.29, 683, 99.0], ["Trenggalek", 750476, 0.46, 1.77, 601, 100.2], ["Tulungagung", 1125005, 0.55, 2.66, 983, 100.0], ["Blitar", 1282970, 0.83, 3.03, 735, 100.8], ["Kediri", 1714171, 0.82, 4.05, 1125, 101.7], ["Malang", 2774002, 0.77, 6.55, 799, 100.7], ["Lumajang", 1158367, 0.6, 2.74, 645, 97.6], ["Jember", 2635737, 0.67, 6.22, 795, 99.1], ["Banyuwangi", 1774328, 0.66, 4.19, 494, 99.7], ["Bondowoso", 800132, 0.53, 1.89, 515, 97.3], ["Situbondo", 707572, 0.54, 1.67, 428, 96.6], ["Probolinggo", 1200981, 0.72, 2.84, 696, 97.4], ["Pasuruan", 1681022, 0.8, 3.97, 1126, 99.9], ["Sidoarjo", 2215288, 1.08, 5.23, 306, 100.7], ["Mojokerto", 1170760, 0.79, 2.76, 1189, 100.9], ["Jombang", 1384556, 0.86, 3.27, 1248, 101.5], ["Nganjuk", 1145155, 0.64, 2.7, 888, 100.8], ["Madiun", 763828, 0.45, 1.8, 686, 97.7], ["Magetan", 692785, 0.56, 1.64, 981, 96.7], ["Ngawi", 889988, 0.39, 2.1, 638, 97.8], ["Bojonegoro", 1335288, 0.44, 3.15, 577, 100.4], ["Tuban", 1237088, 0.56, 2.92, 627, 99.5], ["Lamongan", 1394222, 0.64, 3.29, 795, 99.9], ["Gresik", 1390172, 1.02, 3.28, 1107, 101.2], ["Bangkalan", 1123061, 1.0, 2.65, 863, 97.8], ["Sampang", 1038386, 1.2, 2.45, 845, 98.8], ["Pamekasan", 901666, 1.03, 2.13, 1134, 97.0], ["Sumenep", 1165227, 0.62, 2.75, 559, 94.2], ["Kota Kediri", 304129, 1.03, 0.72, 4524, 100.6], ["Kota Blitar", 157785, 0.98, 0.37, 4753, 98.2], ["Kota Malang", 886820, 0.87, 2.09, 7984, 98.6], ["Kota Probolinggo", 254569, 1.06, 0.6, 4656, 98.6], ["Kota Pasuruan", 225257, 1.4, 0.53, 5776, 100.0], ["Kota Mojokerto", 139817, 0.95, 0.33, 6915, 98.0], ["Kota Madiun", 205316, 0.88, 0.48, 5683, 95.9], ["Kota Surabaya", 2940265, 0.4, 6.94, 8753, 97.8], ["Kota Batu", 227482, 1.15, 0.54, 1172, 101.1]].map(r=>({n:r[0],p:r[1],g:r[2],s:r[3],d:r[4],r:r[5],t:r[0].startsWith("Kota ")?"kota":"kab",a:r[1]/r[4]}));
+const REF={p:42352024,d:882,g:0.71,r:99.3};
+const id=x=>document.getElementById(x),N=v=>Math.round(v).toLocaleString("id-ID"),P=(v,k=1)=>v.toLocaleString("id-ID",{minimumFractionDigits:k,maximumFractionDigits:k});
+let S={f:"all",d:"",r:"",q:""},CH={},SK="p",SD=-1;
+const dg=x=>x.d<600?"r":x.d<=1500?"s":"t";
+const cur=()=>D.filter(x=>(S.f==="all"||x.t===S.f)&&(!S.d||dg(x)===S.d)&&(!S.r||(S.r==="l"?x.r>100:x.r<100))&&x.n.toLowerCase().includes(S.q));
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const tc=t=>t==="kota"?css("--kota"):css("--kab");
+function mk(c,cfg){if(CH[c])CH[c].destroy();Chart.defaults.color=css("--mut");Chart.defaults.font.family="Inter,Segoe UI,sans-serif";Chart.defaults.font.size=13;Chart.defaults.animation.duration=250;
+ CH[c]=new Chart(id(c),Object.assign({options:{}},cfg));}
+const ax=(t,o={})=>Object.assign({grid:{color:css("--grid")},title:t?{display:true,text:t}:undefined},o);
+function hbar(c,a,k,lab){const s=a.slice().sort((x,y)=>y[k]-x[k]).slice(0,10);
+ mk(c,{type:"bar",data:{labels:s.map(x=>x.n),datasets:[{label:lab,data:s.map(x=>x[k]),backgroundColor:s.map(x=>tc(x.t))}]},
+ options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>lab+": "+(k==="g"?P(i.raw,2)+"%":N(i.raw))}}},scales:{x:ax(lab),y:{grid:{display:false}}}}});}
+function render(){
+ const a=cur();if(!a.length){id("kpi").innerHTML='<div class="card">Tidak ada wilayah yang cocok dengan filter.</div>';Object.values(CH).forEach(c=>c.destroy());CH={};id("tb").innerHTML="";return}
+ const T=a.reduce((s,x)=>s+x.p,0),A=a.reduce((s,x)=>s+x.a,0),dens=T/A,gw=a.reduce((s,x)=>s+x.g*x.p,0)/T,sr=a.reduce((s,x)=>s+x.r*x.p,0)/T,top=a.slice().sort((x,y)=>y.d-x.d)[0];
+ const tr=(v,r,f)=>{const u=v>=r;return `<small class="${u?"up":"dn"}">${u?"▲":"▼"} ${f(v-r)} vs Jawa Timur</small>`};
+ id("kpi").innerHTML=[["Total penduduk",N(T),`<small>${P(T/REF.p*100)}% dari Jawa Timur</small>`],["Kepadatan rata-rata",N(dens)+"/km²",tr(dens,REF.d,v=>N(Math.abs(v)))],["Laju pertumbuhan",P(gw,2)+"%",tr(gw,REF.g,v=>P(Math.abs(v),2)+" poin")],["Rasio jenis kelamin",P(sr),tr(sr,REF.r,v=>P(Math.abs(v)))],["Jumlah wilayah",a.length,`<small>${a.filter(x=>x.t==="kota").length} kota, ${a.filter(x=>x.t==="kab").length} kabupaten</small>`],["Terpadat",top.n.replace("Kota ","Kota "),`<small>${N(top.d)}/km²</small>`]].map(k=>`<div class="card kpi"><span>${k[0]}</span><b>${k[1]}</b>${k[2]}</div>`).join("");
+ hbar("c1",a,"p","Penduduk");hbar("c2",a,"d","Kepadatan");hbar("c7",a,"g","Laju (%)");
+ const gp=t=>{const z=a.filter(x=>x.t===t);return[z.reduce((s,x)=>s+x.p,0)/T*100,z.reduce((s,x)=>s+x.a,0)/A*100]};const kb=gp("kab"),ko=gp("kota");
+ mk("c3",{type:"bar",data:{labels:["Kabupaten","Kota"],datasets:[{label:"Porsi penduduk (%)",data:[kb[0],ko[0]],backgroundColor:css("--kab")},{label:"Porsi luas wilayah (%)",data:[kb[1],ko[1]],backgroundColor:css("--kota")}]},options:{maintainAspectRatio:false,scales:{y:ax("%",{max:100,beginAtZero:true}),x:{grid:{display:false}}},plugins:{tooltip:{callbacks:{label:i=>i.dataset.label+": "+P(i.raw)+"%"}}}}});
+ const sp=t=>({label:t==="kota"?"Kota":"Kabupaten",data:a.filter(x=>x.t===t).map(x=>({x:x.d,y:x.g,n:x.n})),backgroundColor:tc(t),pointRadius:6});
+ mk("c4",{type:"scatter",data:{datasets:[sp("kab"),sp("kota")]},options:{maintainAspectRatio:false,scales:{x:ax("Kepadatan (jiwa/km²)",{type:"logarithmic"}),y:ax("Laju pertumbuhan (%)")},plugins:{tooltip:{callbacks:{label:i=>`${i.raw.n}: ${N(i.raw.x)}/km², ${P(i.raw.y,2)}%`}}}}});
+ const bins=[a.filter(x=>x.r<97),a.filter(x=>x.r>=97&&x.r<99),a.filter(x=>x.r>=99&&x.r<101),a.filter(x=>x.r>=101)];
+ mk("c5",{type:"bar",data:{labels:["< 97","97–98,9","99–100,9","≥ 101"],datasets:[{label:"Jumlah wilayah",data:bins.map(b=>b.length),backgroundColor:css("--kab")}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:i=>bins[i.dataIndex].slice(0,5).map(x=>x.n).join(", ")}}},scales:{y:ax("Wilayah",{beginAtZero:true,ticks:{precision:0}}),x:{grid:{display:false}}}}});
+ const gs=["r","s","t"].map(k=>a.filter(x=>dg(x)===k).reduce((s,x)=>s+x.p,0)/T*100);
+ mk("c6",{type:"doughnut",data:{labels:["Rendah (<600)","Sedang (600–1.500)","Tinggi (>1.500)"],datasets:[{data:gs,backgroundColor:[css("--grid"),css("--kab"),css("--kota")],borderColor:css("--card")}]},options:{maintainAspectRatio:false,plugins:{legend:{position:"bottom"},tooltip:{callbacks:{label:i=>i.label+": "+P(i.raw)+"%"}}}}});
+ table(a);
+}
+function insights(a,T,A,kb,ko){
+ const by=k=>a.slice().sort((x,y)=>y[k]-x[k]),L=[],t3=by("p").slice(0,3),t3s=t3.reduce((s,x)=>s+x.p,0)/T*100;
+ L.push(["Konsentrasi penduduk",`Tiga wilayah terbesar (${t3.map(x=>x.n).join(", ")}) memuat ${P(t3s)}% penduduk. Apakah alokasi layanan dasar sudah mengikuti konsentrasi ini?`]);
+ const d=by("d"),lo=d[d.length-1];L.push(["Kesenjangan kepadatan",`${d[0].n} (${N(d[0].d)}/km²) sekitar ${P(d[0].d/lo.d,0)} kali lebih padat dari ${lo.n} (${N(lo.d)}/km²). Strategi infrastruktur dan tata ruang perlu dibedakan antara kedua kutub ini.`]);
+ if(kb[0]&&ko[0])L.push(["Kota padat, wilayah sempit",`Kota menampung ${P(ko[0])}% penduduk di ${P(ko[1])}% luas wilayah. Perlu dikaji tekanan pada perumahan, transportasi, dan lingkungan, atau peluang penyangga di kabupaten sekitar.`]);
+ const g=by("g"),hi=g.filter(x=>x.g>REF.g).length;L.push(["Pertumbuhan",`${hi} dari ${a.length} wilayah tumbuh di atas rata-rata provinsi (0,71%). Tertinggi ${g[0].n} (${P(g[0].g,2)}%), terendah ${g[g.length-1].n} (${P(g[g.length-1].g,2)}%). Wilayah tumbuh cepat perlu diprioritaskan dalam perencanaan layanan.`]);
+ const r=by("r"),lw=r[r.length-1];L.push(["Rasio jenis kelamin",`${lw.n} terendah (${P(lw.r)} laki-laki per 100 perempuan) dan ${r[0].n} tertinggi (${P(r[0].r)}). Apakah pola migrasi keluar laki-laki menjadi penyebabnya, dan apa dampaknya pada tenaga kerja?`]);
+ const pr=a.filter(x=>x.d<600&&x.g<REF.g);L.push(["Wilayah renggang dan lambat tumbuh",pr.length?`${pr.length} wilayah berkepadatan rendah sekaligus tumbuh di bawah rata-rata (${pr.slice(0,4).map(x=>x.n).join(", ")}${pr.length>4?", dll":""}). Perlu ditinjau apakah ada risiko penurunan penduduk usia produktif.`:"Tidak ada wilayah berkepadatan rendah dengan pertumbuhan di bawah rata-rata pada pilihan filter ini."]);
+ id("ins").innerHTML=L.map(i=>`<div class="card"><h3>${i[0]}</h3><p>${i[1]}</p></div>`).join("");}
+const H=[["n","Wilayah"],["p","Penduduk"],["g","Laju (%)"],["s","Persen"],["d","Kepadatan"],["r","Rasio JK"]];
+function table(a){const b=a.slice().sort((x,y)=>(x[SK]>y[SK]?1:-1)*SD);
+ id("tb").innerHTML="<thead><tr>"+H.map(h=>`<th data-k="${h[0]}">${h[1]}${h[0]===SK?(SD>0?" ▲":" ▼"):""}</th>`).join("")+"</tr></thead><tbody>"+b.map(x=>`<tr><td>${x.n}</td><td>${N(x.p)}</td><td>${P(x.g,2)}</td><td>${P(x.s,2)}</td><td>${N(x.d)}</td><td>${P(x.r)}</td></tr>`).join("")+"</tbody>";
+ id("tb").querySelectorAll("th").forEach(t=>t.onclick=()=>{SD=t.dataset.k===SK?-SD:-1;SK=t.dataset.k;table(cur())});}
+id("seg").onclick=e=>{if(!e.target.dataset.f)return;S.f=e.target.dataset.f;document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b===e.target));render()};
+id("fd").onchange=e=>{S.d=e.target.value;render()};id("fr").onchange=e=>{S.r=e.target.value;render()};id("q").oninput=e=>{S.q=e.target.value.toLowerCase();render()};
+id("rs").onclick=()=>{S={f:"all",d:"",r:"",q:""};id("fd").value=id("fr").value=id("q").value="";document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.f==="all"));render()};
+matchMedia("(prefers-color-scheme: dark)").onchange=render;
+render();
+</script></body></html>
